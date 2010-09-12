@@ -23,12 +23,21 @@ Then /^the following parameters should be received as a result:$/ do |table|
 
         raise "Reply does not have #{key}" unless data.keys.include?(key)
 
-        if val =~ /^\/(.+)\/$/
-            regex = Regexp.new($1)
+        if val == "should be present"
+            raise "Received data does not include #{key}" unless data.include?(key)
         else
-            regex = Regexp.new("^#{val}$")
-        end
+            if data[key].is_a?(String)
+                if val =~ /^\/(.+)\/$/
+                    regex = Regexp.new($1)
+                else
+                    regex = Regexp.new("^#{val}$")
+                end
 
-        raise "#{data[key]} does not match regex #{regex}" unless data[key].match(regex)
+                raise "#{data[key]} does not match regex #{regex}" unless data[key].match(regex)
+
+            elsif data[key].is_a?(Fixnum)
+                raise "#{data[key]} does not match Fixnum #{val.to_i}" unless val.to_i == data[key]
+            end
+        end
     end
 end
